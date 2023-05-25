@@ -77,6 +77,17 @@ doc = ["sphinx"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "tomli"
+version = "2.0.1"
+description = "A lil' TOML parser"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
+    {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.6.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -98,7 +109,21 @@ files = [
     {file = "tzdata-2023.3.tar.gz", hash = "sha256:11ef1e08e54acb0d4f95bdb1be05da659673de4acbd21bf9c69e94cc5e907a3a"},
 ]
 
+[[package]]
+name = "yapf"
+version = "0.33.0"
+description = "A formatter for Python code."
+optional = false
+python-versions = "*"
+files = [
+    {file = "yapf-0.33.0-py2.py3-none-any.whl", hash = "sha256:4c2b59bd5ffe46f3a7da48df87596877189148226ce267c16e8b44240e51578d"},
+    {file = "yapf-0.33.0.tar.gz", hash = "sha256:da62bdfea3df3673553351e6246abed26d9fe6780e548a5af9e70f6d2b4f5b9a"},
+]
+
+[package.dependencies]
+tomli = ">=2.0.1"
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "084404180d3e9e60adc8d07bcf52c348d823ec235dd4a1e982fc35c507caca15"
+content-hash = "a6a5bfd61dd14ed0b8132c4cdf2aa99928461cb267e9b31116fa034cead6b4c5"
