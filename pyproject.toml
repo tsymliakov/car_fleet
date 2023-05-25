@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "car-fleet"
+version = "0.1.0"
+description = ""
+authors = ["Denis <makrotheeast@gmail.com>"]
+readme = "README.md"
+packages = [{include = "car_fleet"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^4.2.1"
+psycopg = "^3.1.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
