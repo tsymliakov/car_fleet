@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'vehicle',
     'brand',
     'rest_framework',
+    'driver',
+    'enterprise',
 ]
 
 MIDDLEWARE = [

@@ -1,5 +1,6 @@
 from django.db import models
 from brand.models import Brand
+from enterprise.models import Enterprise
 
 
 class Vehicle(models.Model):
@@ -9,3 +10,4 @@ class Vehicle(models.Model):
     production_year = models.DateField()
 
     brand = models.ForeignKey(Brand, on_delete=models.PROTECT)
+    company = models.ForeignKey(Enterprise, on_delete=models.SET_NULL)
