@@ -1,11 +1,6 @@
 from rest_framework import serializers
-from .models import Vehicle, Brand
-
-
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
-        fields = '__all__'
+from .models import Vehicle
+from brand.serializers import BrandSerializer
 
 
 class VehicleSerializer(serializers.ModelSerializer):

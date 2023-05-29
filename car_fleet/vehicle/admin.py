@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Vehicle, Brand
+from .models import Vehicle
+from brand.models import Brand
 
 
 @admin.register(Vehicle)
