@@ -9,5 +9,10 @@ class Vehicle(models.Model):
     mileage = models.IntegerField()
     production_year = models.DateField()
 
+    # NOTE: у одного бренда много машин, один ко многим
     brand = models.ForeignKey(Brand, on_delete=models.PROTECT)
-    company = models.ForeignKey(Enterprise, on_delete=models.SET_NULL)
+    # NOTE: у одной компании много машин, один ко многим
+    enterprise = models.ForeignKey(Enterprise, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f'{self.id}, {self.brand.name}'
