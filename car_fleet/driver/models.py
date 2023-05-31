@@ -18,7 +18,7 @@ class Driver(models.Model):
     enterprise = models.ForeignKey(Enterprise, on_delete=models.SET_NULL, blank=True, null=True)
 
     # NOTE: у одной машины много водителей, у одного водителя много машин, многие ко многим
-    vehicle = models.ManyToManyField(Vehicle)
+    vehicle = models.ManyToManyField(Vehicle, blank=True)
 
     def __str__(self):
         return f'{self.id}, {self.first_name} {self.last_name}'
