@@ -1,3 +1,11 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
+from django.http import JsonResponse
+from .models import Driver
+from .serializers import DriverSerializer
 
-# Create your views here.
+
+class DriverIndexAPI(APIView):
+    def get(self, request):
+        drivers = Driver.objects.all()
+        serializer = DriverSerializer(drivers, many=True)
+        return JsonResponse(serializer.data, safe=False)
