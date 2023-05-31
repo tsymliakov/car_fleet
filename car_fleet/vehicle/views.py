@@ -1,5 +1,4 @@
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.http import JsonResponse
 from .models import Vehicle
 from .serializers import VehicleSerializer

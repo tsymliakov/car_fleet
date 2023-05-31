@@ -19,4 +19,4 @@ class Brand(models.Model):
     passanger_seat_count = models.IntegerField()
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.id}, {self.name}'
