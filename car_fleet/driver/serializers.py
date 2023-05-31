@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Driver
 
 
-class DriverSerializer(serializers.ModelSerializer):
+class DriverFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
-        fields = ('id',)
+        fields = ('id', 'enterprise', 'vehicle', 'active_vehicle')
