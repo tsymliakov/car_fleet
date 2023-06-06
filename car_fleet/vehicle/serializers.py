@@ -8,4 +8,4 @@ class VehicleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vehicle
-        fields = ('id', 'rental_per_hour', 'total_cost', 'mileage', 'production_year', 'brand')
+        fields = ('id', 'rental_per_hour', 'total_cost', 'mileage', 'production_year', 'brand', 'enterprise')
