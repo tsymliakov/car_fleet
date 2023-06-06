@@ -20,5 +20,5 @@ class EnterpriseIndexAPI(APIView):
             serializer = EnterpriseSerializer(enterprises, many=True)
             return JsonResponse(serializer.data, safe=False)
 
-        return HttpResponseForbidden('Доступ запрещен')
+        return HttpResponseForbidden('Доступ запрещен\n')
 
