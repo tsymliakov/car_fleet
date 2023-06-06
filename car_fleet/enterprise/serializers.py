@@ -3,6 +3,7 @@ from .models import Enterprise
 
 
 class EnterpriseSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Enterprise
-        fields = ('id', 'name', 'location', 'manager')
+        fields =  ('id', 'name', 'location', 'vehicle', 'drivers')
