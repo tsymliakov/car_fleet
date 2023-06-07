@@ -3,3 +3,5 @@
 *.code-workspace
 *.txt
 .vscode
+settings copy.py
+car_fleet/just_a_base
