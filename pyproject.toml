@@ -12,6 +12,7 @@ Django = "^4.2.1"
 psycopg = "^3.1.9"
 djangorestframework = "^3.14.0"
 faker = "^18.10.1"
+debugpy = "^1.6.7"
 
 
 [tool.poetry.group.dev.dependencies]

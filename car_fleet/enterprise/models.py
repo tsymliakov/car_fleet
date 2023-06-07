@@ -7,11 +7,11 @@ class Enterprise(models.Model):
     location = models.TextField()
 
     def __str__(self):
-        return f'id: {self.id}, {self.name}'
+        return f'id: {self.id}, {self.name}, {self.location}'
 
 
-def generate_data_for_enterprise():
+def get_enterprise():
     fake = Faker()
-    name  = fake.text().split()[-2].capitalize()
+    name  = fake.company()
     location = fake.city()
-    return name, location
+    return Enterprise(name=name, location=location)
