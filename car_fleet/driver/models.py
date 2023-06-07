@@ -15,7 +15,7 @@ class Driver(models.Model):
     vehicle = models.ManyToManyField(to='vehicle.Vehicle', blank=True)
     active_vehicle = models.OneToOneField(to='vehicle.Vehicle', blank=True, null=True, on_delete=models.SET_NULL, related_name='active_driver')
 
-    enterprise = models.ForeignKey(to='enterprise.Enterprise', on_delete=models.SET_NULL, blank=True, null=True, related_name='drivers')
+    enterprise = models.ForeignKey(to='enterprise.Enterprise', on_delete=models.SET_NULL, blank=True, null=True, related_name='driver')
 
     def __str__(self):
         return f'{self.id}, {self.first_name} {self.last_name}'

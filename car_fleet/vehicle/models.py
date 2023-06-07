@@ -35,6 +35,7 @@ def get_vehicle():
     mileage = fake.random_int(min=5000, max=160000)
     production_year = fake.random_int(min=1960, max=date.today().year)
     brand = get_brand()
+    brand.save()
 
     return Vehicle(rental_per_hour=rental_per_hour,
                    total_cost=total_cost,
