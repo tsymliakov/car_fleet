@@ -11,6 +11,8 @@ python = "^3.10"
 Django = "^4.2.1"
 psycopg = "^3.1.9"
 djangorestframework = "^3.14.0"
+mimesis = "^10.1.0"
+faker = "^18.10.1"
 
 
 [tool.poetry.group.dev.dependencies]
