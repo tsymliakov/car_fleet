@@ -14,12 +14,13 @@ djangorestframework = "^3.14.0"
 faker = "^18.10.1"
 debugpy = "^1.6.7"
 bandit = "^1.7.5"
+autopep8 = "^2.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
 yapf = "^0.33.0"
-autopep8 = "^2.0.2"
 bandit = "^1.7.5"
+flake8 = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core"]

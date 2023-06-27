@@ -10,7 +10,7 @@
     <form action="{% url 'login_manager' %}" method="post">
         {% csrf_token %}
         <p>Имя пользователя:</p>
-        <input type="text" name="username">
+        <input type="text" name="username" value="{{ username }}">
         <p>Пароль:</p>
         <input type="password" name="password">
         <p></p>

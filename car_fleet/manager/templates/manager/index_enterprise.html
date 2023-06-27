@@ -8,8 +8,8 @@
 </head>
 <body>
     <h1>Компании менеджера {{ manager.username }}</h1>
-    {% for comp in companies %}
-        <li>{{ comp.name }}<li>
+    {% for enterprise in enterprises %}
+        <li><a href={% url 'enterprise' name=enterprise.name %}>{{ enterprise.name }}</a><li>
     {% endfor %}
 </body>
 </html>
