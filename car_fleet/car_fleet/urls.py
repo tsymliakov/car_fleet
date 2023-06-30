@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .views import TimeView
+
 
 urlpatterns = [
+    path('', TimeView.as_view()),
     path('admin/', admin.site.urls),
     path('vehicle/', include('vehicle.urls')),
     path('enterprise/', include('enterprise.urls')),

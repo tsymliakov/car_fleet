@@ -22,8 +22,8 @@ class Vehicle(models.Model):
     # NOTE: у одной компании много машин, один ко многим
     enterprise = models.ForeignKey(to='enterprise.Enterprise', on_delete=models.SET_NULL,
                                    null=True, related_name='vehicle')
-    # driver
-    # active_driver
+    buy_datetime = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return f'{self.id}, {self.brand.name}'
 

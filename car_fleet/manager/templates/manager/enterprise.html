@@ -15,6 +15,13 @@
                 <td>{{ vehicle.id }}</td>
                 <td>{{ vehicle.brand.name }}</td>
                 <td>
+                    {% load tz %}
+
+                    {% timezone vehicle.enterprise.timezone %}
+                        {{ vehicle.buy_datetime }}
+                    {% endtimezone %}
+                </td>
+                <td>
                     <form action="{% url 'change_vehicle' id=vehicle.id %}" method="get">
                         <input type="submit" value="Изменить">
                     </form>
