@@ -49,23 +49,12 @@ class ViewEnterprise(ListView):
     enterprise = None
 
     def get(self, request, *args, **kwargs):
+        v = Vehicle.objects.all()[0]
+        print(str(v.buy_datetime))
         response = super().get(request, *args, **kwargs)
         ViewEnterprise.enterprise = kwargs['name']
-        # response.
         response.context_data['enterprise'] = ViewEnterprise.enterprise
         return response
 
     def get_queryset(self):
         return Vehicle.objects.filter(enterprise__name=ViewEnterprise.enterprise)
-
-
-    # def get(self, request, *args, **kwargs):
-    #     enterprise = Enterprise.objects.get(name=kwargs['name'])
-
-    #     start_id = request.GET.get('start')
-    #     end_id = request.GET.get('end')
-
-    #     vehicles = enterprise.vehicle.all()
-    #     return render(request, 'manager/enterprise.html', context={
-    #         'vehicles': vehicles
-    #     })
