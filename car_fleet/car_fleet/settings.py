@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'driver',
     'enterprise',
     'manager',
+    'django.contrib.gis',
+    'route',
 ]
 
 REST_FRAMEWORK = {
@@ -91,7 +93,7 @@ WSGI_APPLICATION = 'car_fleet.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': LOCAL_SETTINGS.get('db_name'),
         'USER': LOCAL_SETTINGS.get('db_username'),
         'PASSWORD': LOCAL_SETTINGS.get('db_user_password'),
