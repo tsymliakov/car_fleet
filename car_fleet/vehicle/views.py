@@ -1,15 +1,10 @@
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import CreateView
-from rest_framework.views import APIView
-from django.http import JsonResponse, HttpResponseForbidden
 from vehicle.forms import VehicleForm
 
-from enterprise.models import Enterprise
 from .models import Vehicle
 from .serializers import VehicleSerializer
-from manager.models import Manager
-from rest_framework.response import Response
 from rest_framework import generics
 
 

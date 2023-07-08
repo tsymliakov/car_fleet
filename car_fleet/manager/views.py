@@ -50,7 +50,6 @@ class ViewEnterprise(ListView):
 
     def get(self, request, *args, **kwargs):
         v = Vehicle.objects.all()[0]
-        print(str(v.buy_datetime))
         response = super().get(request, *args, **kwargs)
         ViewEnterprise.enterprise = kwargs['name']
         response.context_data['enterprise'] = ViewEnterprise.enterprise

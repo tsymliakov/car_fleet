@@ -26,4 +26,5 @@ urlpatterns = [
     path('enterprise/', include('enterprise.urls')),
     path('driver/', include('driver.urls')),
     path('manager/', include('manager.urls')),
+    path('point/', include('point.urls')),
 ]
