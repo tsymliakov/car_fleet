@@ -27,8 +27,6 @@ class GetPointsOfVehicle(generics.ListCreateAPIView):
                                                                         microsecond=0))
         end_datetime = self.request.GET.get('end_time', datetime.utcnow())
 
-        print(start_datetime, end_datetime)
-
         return Point.objects.filter(vehicle__id=vehicle_id).filter(time__lte=end_datetime).filter(time__gte=start_datetime)
 
 

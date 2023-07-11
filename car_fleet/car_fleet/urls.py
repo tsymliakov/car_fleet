@@ -27,4 +27,5 @@ urlpatterns = [
     path('driver/', include('driver.urls')),
     path('manager/', include('manager.urls')),
     path('point/', include('point.urls')),
+    path('route/', include('route.urls')),
 ]

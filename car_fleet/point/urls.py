@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import GetPointsOfVehicle, PointsIndex
+from .views import PointsIndex
 
 urlpatterns = [
     path('<int:id>/', PointsIndex.as_view()),
