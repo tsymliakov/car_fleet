@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import RouteIndex
+from views import RoutesIndex
+
+
 
 urlpatterns = [
-    path('<int:id>/', RouteIndex.as_view()),
+    path('/', RoutesIndex.as_view()),
 ]
