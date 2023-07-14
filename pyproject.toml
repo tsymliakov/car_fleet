@@ -15,6 +15,7 @@ faker = "^18.10.1"
 debugpy = "^1.6.7"
 bandit = "^1.7.5"
 autopep8 = "^2.0.2"
+geopy = "^2.3.0"
 
 
 [tool.poetry.group.dev.dependencies]
