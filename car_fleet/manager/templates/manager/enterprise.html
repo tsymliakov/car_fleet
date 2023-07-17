@@ -15,15 +15,11 @@
     <table>
         {% for vehicle in page_obj %}
             <tr>
-                <td>{{ vehicle.id }}</td>
-                <td>{{ vehicle.brand.name }}</td>
                 <td>
-                    {% load tz %}
-
-                    {% timezone vehicle.enterprise.timezone %}
-                        {{ vehicle.buy_datetime }}
-                    {% endtimezone %}
+                    <a href={% url 'vehicle' vehicle.id%}>{{ vehicle.id }} {{ vehicle.brand.name }}
+                    </a>
                 </td>
+
                 <td>
                     <div id="{{ vehicle.id }}"></div>
                 </td>
@@ -38,12 +34,12 @@
                     </form>
                 </td>
             </tr>
-            <script>
-                tat = new Date({{ vehicle.buy_datetime.timestamp }} * 1000);
-                console.log(tat);
-                element = document.getElementById("{{ vehicle.id }}")
-                element.textContent=tat;
-            </script>
+{#            <script>#}
+{#                tat = new Date({{ vehicle.buy_datetime.timestamp }} * 1000);#}
+{#                console.log(tat);#}
+{#                element = document.getElementById("{{ vehicle.id }}")#}
+{#                element.textContent=tat;#}
+{#            </script>#}
         {% endfor %}
     </table>
 

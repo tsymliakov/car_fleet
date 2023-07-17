@@ -20,9 +20,6 @@ def get_location(point):
 
 class RouteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
-        timezone = pytz.timezone(instance.vehicle.enterprise.timezone)
-        # self.fields['start'] = serializers.DateTimeField(default_timezone=timezone)
-        # self.fields['end'] = serializers.DateTimeField(default_timezone=timezone)
         representation = super().to_representation(instance)
 
         self.fields['route_start_location'] = serializers.CharField()

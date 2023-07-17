@@ -7,20 +7,37 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>{{ vehicle.enterprise.name }}. {{ vehicle.id }} {{ vehicle.brand.name }}</h1>
-    <form action="{% url 'change_vehicle' id=vehicle.id %}" method="post">
-        {% csrf_token %}
+    {% if routes %}
         <table>
-            <tr>
-                <td>Почасовая стоимость, $/час</td>
-                <td><input type="number" name="rental" value={{ vehicle.rental_per_hour}}></td>
-            </tr>
-            <tr>
-                <td>Пробег, км</td>
-                <td><input type="number" name="mileage" value={{ vehicle.mileage}}></td>
-            </tr>
+            <td><b>ID маршрута |</b></td>
+            <td><b>Адрес начала маршрута |</b></td>
+            <td><b>Адрес окончания маршрута</b></td>
+            {% for r in routes %}
+                <tr>
+                    <td><a href={% url 'route_on_map' r.id %}>{{ r.id }}</a></td>
+                    <td>{{ r.start_address }}</td>
+                    <td>{{ r.end_address }}</td>
+                </tr>
+            {% endfor %}
         </table>
-        <input type="submit" value="Подтвердить">
-    </form>
+        <p></p>
+        <form>
+            <button type="submit">Выбрать другой временной промежуток</button>
+        </form>
+    {% else %}
+        <form>
+            <p>
+                <label for="start_datetime">Дата и время начала поездки: </label>
+                <input type="datetime-local" id="start_datetime" name="start_datetime"/>
+            </p>
+            <p>
+                <label for="end_datetime">Дата и время окончания поездки: </label>
+                <input type="datetime-local" id="end_datetime" name="end_datetime"/>
+            </p>
+            <p>
+                <button type="submit">Получить маршруты за указанный промежуток</button>
+            </p>
+        </form>
+    {% endif %}
 </body>
 </html>
