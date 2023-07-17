@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>{{ vehicle.enterprise.name }}. {{ vehicle.id }} {{ vehicle.brand.name }}</h1>
+    <form action="{% url 'change_vehicle' id=vehicle.id %}" method="post">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td>Почасовая стоимость, $/час</td>
+                <td><input type="number" name="rental" value={{ vehicle.rental_per_hour}}></td>
+            </tr>
+            <tr>
+                <td>Пробег, км</td>
+                <td><input type="number" name="mileage" value={{ vehicle.mileage}}></td>
+            </tr>
+        </table>
+        <input type="submit" value="Подтвердить">
+    </form>
+</body>
+</html>
