@@ -32,11 +32,12 @@ class RouteOnMap(View):
         for i, p in enumerate(points):
             latitude = p.point.y
             longitude = p.point.x
-            point_params.append(f"{latitude},{longitude},pmwtm{i + 1}")
+            point_params.append(f"{latitude},{longitude}")
 
-        points_for_url = '~'.join(point_params)
+        points_for_url = ','.join(point_params)
 
-        url = f"https://static-maps.yandex.ru/1.x/?l=map&pt={points_for_url}&apikey={api_key}"
+        url = f"https://static-maps.yandex.ru/1.x/?l=map&pl={points_for_url}&\
+        pt={points_for_url[0]},vkbkm&apikey={api_key}"
 
         r = requests.get(url)
 
