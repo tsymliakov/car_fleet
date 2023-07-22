@@ -54,28 +54,12 @@ class Command(BaseCommand):
         return timedelta(seconds=seconds)
 
     def dot_points(self, points):
-        model_points = [Point(time=self.curr_time,
-                              vehicle=self.vehicle,
-                              point=f'POINT({points[0][0] % 180} {points[0][1] % 90})')]
+        for p in points:
+            Point.objects.create(time=datetime.now(),
+                                vehicle=self.vehicle,
+                                point=f'POINT({p[0] % 180} {p[1] % 90})').save()
 
-        for i in range(len(points) - 1)[1:]:
-            x1 = points[i - 1][0]
-            y1 = points[i - 1][1]
-
-            x2 = points[i][0]
-            y2 = points[i][1]
-
-            distance = self.get_length_between_points(x1, y1, x2, y2)
-            tdelta = self.get_timedelta(distance)
-
-            self.curr_time += tdelta
-
-            if i % 10 == 0:
-                model_points.append(Point(time=self.curr_time,
-                                          vehicle=self.vehicle,
-                                          point=f'POINT({points[i][0] % 180} {points[i][1] % 90})'))
-
-        Point.objects.bulk_create(model_points)
+            sleep(1)
 
     def handle(self, *args, **options):
         self.vehicle = Vehicle.objects.get(id=469)  # Vehicle.objects.get(id=options['id'])
@@ -86,26 +70,39 @@ class Command(BaseCommand):
         self.points_deviation = options['points_deviation']
         self.timestamp = options['timestamp'] or 1
 
-        x, y = 37.4, 55.5  # Moscow GPS coordinates
+        Point.objects.all().delete()
 
-        curr_point = self.get_point_on_road(x, y, randint(0, 5))
+        route = self.create_route()
 
-        self.current_length = 0
-        self.start_speed = 0
-        self.curr_time = datetime.now()
+        less_route = route[::len(route) // 20]
 
-        while self.current_length < self.length:
-            sleep(self.timestamp)
+        self.dot_points(less_route)
 
-            next_point = self.get_point_on_road(x, y, randint(0, 10))
+    def create_route(self):
+        while True:
+            start_city = self.get_random_city_coord()
+            end_city = self.get_random_city_coord()
 
-            points = self.get_route(*curr_point, *next_point)
+            start_lat, start_lng = start_city['lat'], start_city['lng']
+            end_lat, end_lng = end_city['lat'], end_city['lng']
 
-            self.dot_points(points)
+            try:
+                route = self.get_route(start_lng, start_lat, end_lng, end_lat)
+                break
+            except:
+                continue
 
-    def get_point_on_road(self, x, y, order):
+        return route
+
+    def get_random_city_coord(self):
+        with open("ru_cities.json", "r") as c:
+            cities = load(c)
+        r = randint(0, len(cities) - 1)
+        return cities[r]
+
+    def get_point_on_road(self, x, y, order, deviation):
         r = request(method="GET",
-                    url=f"https://api.openrouteservice.org/geocode/reverse?api_key={api_key_openroute}&point.lon={x}&point.lat={y}&boundary.circle.radius={self.between_points * 10}&size=51")
+                    url=f"https://api.openrouteservice.org/geocode/reverse?api_key={api_key_openroute}&point.lon={x}&point.lat={y}&boundary.circle.radius={deviation}&size={order + 1}")
         point_on_road = r.json()['features'][order]['geometry']['coordinates']
 
         return point_on_road[0], point_on_road[1]
