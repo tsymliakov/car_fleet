@@ -21,7 +21,7 @@ class RouteOnMap(View):
 
         points = Point.objects.filter(vehicle__id=vehicle_id)\
             .filter(time__gte=route.start)\
-            .filter(time__lte=route.end)
+            .filter(time__lte=route.end)[:99]
 
         with open("settings.json", "r") as settings_file:
             LOCAL_SETTINGS = load(settings_file)
