@@ -1,14 +1,20 @@
 from datetime import datetime, timedelta
-from math import cos, sin
+from json import load
+from math import sqrt
+
 from django.core.management.base import BaseCommand
+from requests import request
+
 from point.models import Point
 from vehicle.models import Vehicle
 from random import randint
 
 from time import sleep
 
+EARTH_СIRCUMFERENCE = 40000 * 1000
 
-EARTH_CIRCUMFERENCE = 40000 * 1000
+with open("settings.json", "r") as settings_file:
+    api_key_openroute = load(settings_file)['api_key_openroute']
 
 
 class Command(BaseCommand):
@@ -23,75 +29,86 @@ class Command(BaseCommand):
         parser.add_argument('--points-deviation', type=int)
         parser.add_argument('--timestamp', type=int)
 
-    def get_length_to_next_point(self, start_speed):
-        acceleration =  randint(self.max_acceleration * (- 2), self.max_acceleration)
-        end_speed = start_speed + acceleration * self.timestamp
+    def get_length_between_points(self, x1, y1, x2, y2):
+        delta_x = abs(x2 - x1)
+        delta_y = abs(y2 - y1)
+
+        length_degrees = sqrt(delta_x ** 2 + delta_y ** 2)
+        length_meters = length_degrees / 360 * EARTH_СIRCUMFERENCE
+
+        return length_meters
+
+    def get_timedelta(self, distance):
+        acceleration = randint(0, self.max_acceleration)
+        end_speed = sqrt(self.start_speed ** 2 + 2 * acceleration * distance)
 
         if (end_speed - self.max_speed) > 0.01:
-            acceleration_time = abs(self.max_speed - start_speed) / acceleration
-            inc_speed_segment_len = (start_speed + self.max_speed) / 2 * acceleration_time
-            const_speed_segment_len = (self.timestamp - acceleration_time) * self.max_speed
             end_speed = self.max_speed
-            segment_len = inc_speed_segment_len + const_speed_segment_len
-            return (segment_len, end_speed)
-        if end_speed < 0:
-            acceleration_time = start_speed / acceleration
-            inc_speed_segment_len = start_speed / 2 * acceleration_time
-            end_speed = 0
-            return (inc_speed_segment_len, end_speed)
+            seconds = distance / end_speed
+            return timedelta(seconds=seconds)
 
-        segment_len = start_speed * self.timestamp + 0.5 * acceleration * (self.timestamp ** 2)
-        return (segment_len, end_speed)
+        try:
+            seconds = distance / self.start_speed
+        except ZeroDivisionError:
+            seconds = self.timestamp - 1
+        return timedelta(seconds=seconds)
 
-    def dot_the_points(self, lengthstamps, start_point):
-        x = start_point.point[0]
-        y = start_point.point[1]
-        time = start_point.time
-        full_length = sum(lengthstamps)
-        point = start_point
+    def dot_points(self, points):
+        for p in points:
+            Point.objects.create(time=datetime.now(),
+                                vehicle=self.vehicle,
+                                point=f'POINT({p[0] % 180} {p[1] % 90})').save()
 
-        for l in lengthstamps:
-            angle = randint(0, 90)
-            l_in_degrees = 360 * l / EARTH_CIRCUMFERENCE
-            delta_x = l_in_degrees * sin(angle)
-            delta_y = l_in_degrees * sin(90 - angle)
-            try:
-                time = time + timedelta(seconds=self.timestamp * (l / full_length))
-            except ZeroDivisionError:
-                 time = time + timedelta(seconds=self.timestamp)
-            point = Point(time=time, vehicle=self.vehicle,  point=f'POINT({(x + delta_x) % 180} {(y + delta_y) % 90})')
-            point.save()
-
-        return point
+            sleep(1)
 
     def handle(self, *args, **options):
-        self.vehicle = Vehicle.objects.get(id=1) # Vehicle.objects.get(id=options['id'])
+        self.vehicle = Vehicle.objects.get(id=469)  # Vehicle.objects.get(id=options['id'])
         self.length = options['length'] or 10000
         self.max_speed = options['max_speed'] or 20
         self.max_acceleration = options['max_acceleration'] or 5
-        self.between_points = options['between_points'] or 10
+        self.between_points = options['between_points'] or 25
         self.points_deviation = options['points_deviation']
         self.timestamp = options['timestamp'] or 1
 
-        start_speed = 0
-        start_point = Point(time=datetime.now(),
-                            vehicle=self.vehicle,
-                            point=f'POINT({randint(-180,180)} {randint(-90,90)})')
+        Point.objects.all().delete()
 
-        current_length = 0
+        route = self.create_route()
 
-        while current_length < self.length:
-            sleep(self.timestamp)
-            length_to_next_point, start_speed = self.get_length_to_next_point(start_speed)
-            lengthstamps = []
+        less_route = route[::len(route) // 20]
 
-            if length_to_next_point <= self.between_points:
-                lengthstamps.append(length_to_next_point)
+        self.dot_points(less_route)
 
-            while length_to_next_point > self.between_points:
-                lengthstamps.append(self.between_points)
-                length_to_next_point -= self.between_points
+    def create_route(self):
+        while True:
+            start_city = self.get_random_city_coord()
+            end_city = self.get_random_city_coord()
 
-            self.dot_the_points(lengthstamps, start_point)
+            start_lat, start_lng = start_city['lat'], start_city['lng']
+            end_lat, end_lng = end_city['lat'], end_city['lng']
 
-            current_length += length_to_next_point
+            try:
+                route = self.get_route(start_lng, start_lat, end_lng, end_lat)
+                break
+            except:
+                continue
+
+        return route
+
+    def get_random_city_coord(self):
+        with open("ru_cities.json", "r") as c:
+            cities = load(c)
+        r = randint(0, len(cities) - 1)
+        return cities[r]
+
+    def get_point_on_road(self, x, y, order, deviation):
+        r = request(method="GET",
+                    url=f"https://api.openrouteservice.org/geocode/reverse?api_key={api_key_openroute}&point.lon={x}&point.lat={y}&boundary.circle.radius={deviation}&size={order + 1}")
+        point_on_road = r.json()['features'][order]['geometry']['coordinates']
+
+        return point_on_road[0], point_on_road[1]
+
+    def get_route(self, x1, y1, x2, y2):
+        r = request(method="GET",
+                    url=f"https://api.openrouteservice.org/v2/directions/driving-car?api_key={api_key_openroute}&start={x1},{y1}&end={x2},{y2}")
+        points = r.json()['features'][0]['geometry']['coordinates']
+        return points
