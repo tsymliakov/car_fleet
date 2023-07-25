@@ -28,4 +28,5 @@ urlpatterns = [
     path('manager/', include('manager.urls')),
     path('point/', include('point.urls')),
     path('route/', include('route.urls')),
+    path('report/', include('report.urls')),
 ]
