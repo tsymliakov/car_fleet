@@ -20,13 +20,6 @@ class Report(models.Model):
     period = models.TextField(choices=period_choices)
 
 
-class MileageValue(models.Model):
-    date_time = models.DateTimeField()
-    mileage = models.IntegerField()
-
-    report = models.ForeignKey(to='report.VehicleMileageReport', on_delete=models.CASCADE, related_name='date_value')
-
-
 class VehicleMileageReport(Report):
     vehicle = models.ForeignKey(to='vehicle.Vehicle', on_delete=models.CASCADE)
 
@@ -35,3 +28,12 @@ class VehicleMileageReport(Report):
             self.type = "Пробег автомобиля за период"
 
         super().save(*args, **kwargs)
+
+
+class MileageValue(models.Model):
+    date_time = models.DateTimeField()
+    mileage = models.IntegerField()
+
+    report = models.ForeignKey(to='report.VehicleMileageReport',
+                               on_delete=models.CASCADE,
+                               related_name='date_value')

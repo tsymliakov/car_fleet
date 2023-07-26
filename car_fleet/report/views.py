@@ -1,11 +1,12 @@
+from django.db.models import Sum
+from django.db.models.functions import TruncDay, TruncMonth, TruncYear
 from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 from datetime import datetime
 from rest_framework.views import APIView
-from report.models import VehicleMileageReport, MileageValue
-
+from report.models import Report, VehicleMileageReport, MileageValue
 
 
 class ReportsView(View):
@@ -67,14 +68,37 @@ class MileageReportREST(APIView):
 
         if not manager:
             return HttpResponseNotAllowed("Требуется аутентификация.")
-        
+
         if not all((str_start_date, str_end_date, period, vehicle_id)):
             return HttpResponseBadRequest("Не хватает одного или нескольких query- параметров")
 
-        reports_query = VehicleMileageReport.objects.filter(vehicle__id=vehicle_id)\
-                                                    .filter(start_datetime__gte=start_date)\
-                                                    .filter(end_datetime__lte=end_date)
-        
-        values = MileageValue.objects.filter(report__in=reports_query)
+        report = VehicleMileageReport.objects.filter(vehicle__id=vehicle_id)\
+                                             .filter(start_datetime__gte=start_date)\
+                                             .filter(end_datetime__lte=end_date)
 
-        
+        values = MileageValue.objects.filter(report__in=report)
+
+        # if period == Report.DAY:
+        #     daily_sums = values.annotate(day=TruncDay('date_time')) \
+        #                        .values('day') \
+        #                        .annotate(sum=Sum('mileage'))
+        #     result_dict = {entry['day'].strftime('%d-%m-%Y'): entry['sum'] for entry in daily_sums}
+        # if period == Report.MONTH:
+        #     monthly_sums = values.annotate(month=TruncMonth('date_time')) \
+        #                          .values('month') \
+        #                          .annotate(sum=Sum('mileage'))
+        #     result_dict = {entry['month'].strftime('%m-%Y'): entry['sum'] for entry in monthly_sums}
+        if True:#period == Report.YEAR:
+            yearly_sums = values.annotate(year=TruncYear('date_time'))\
+                                 .values('year')\
+                                 .annotate(sum=Sum('mileage'))
+            result_dict = {entry['year'].strftime('%Y'): entry['sum'] for entry in yearly_sums}
+
+        json_report = {'id' : report[0].id,
+                       'type': report[0].type,
+                       'vehicle_id': report[0].vehicle.id,
+                       'start_date': report[0].start_datetime.strftime("%d-%m-%Y"),
+                       'end_date': report[0].end_datetime.strftime("%d-%m-%Y"),
+                       'values': result_dict}
+
+        return JsonResponse(json_report)
