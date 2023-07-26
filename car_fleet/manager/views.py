@@ -20,11 +20,16 @@ class LoginManager(View):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            r = HttpResponseRedirect(reverse('manager_enterprises'))
+            r = HttpResponseRedirect(reverse('menu'))
             r.set_cookie(key="offset", value=request.POST.get('offset'))
             return r
         else:
             return render(request, 'manager/login.html', context={'username': username})
+
+
+class Menu(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'manager/menu.html')
 
 
 class IndexEnterprises(View):

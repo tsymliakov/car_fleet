@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import MonthlyMileageRESTView
+from .views import ReportsView
 
 urlpatterns = [
-    path('mounthlymileage/<int:id>', MonthlyMileageRESTView.as_view(), name='monthlymilage_report')
+    path('', ReportsView.as_view(), name="reports")
 ]

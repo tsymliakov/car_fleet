@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'point',
     'route',
+    'report',
 ]
 
 REST_FRAMEWORK = {
