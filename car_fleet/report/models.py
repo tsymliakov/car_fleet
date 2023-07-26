@@ -20,11 +20,11 @@ class Report(models.Model):
     period = models.TextField(choices=period_choices)
 
 
-class MileAgeValue(models.Model):
+class MileageValue(models.Model):
     date_time = models.DateTimeField()
     mileage = models.IntegerField()
 
-    report = models.ForeignKey(to='report.VehicleMileageReport', on_delete=models.CASCADE)
+    report = models.ForeignKey(to='report.VehicleMileageReport', on_delete=models.CASCADE, related_name='date_value')
 
 
 class VehicleMileageReport(Report):

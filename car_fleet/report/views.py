@@ -1,10 +1,11 @@
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 from datetime import datetime
-from report.models import VehicleMileageReport
 from rest_framework.views import APIView
+from report.models import VehicleMileageReport, MileageValue
+
 
 
 class ReportsView(View):
@@ -49,7 +50,7 @@ class MileageReportREST(APIView):
     def get(self, request, *args, **kwargs):
         str_start_date = request.GET.get('start_date')
         str_end_date = request.GET.get('end_date')
-
+        vehicle_id = request.GET.get('vehicle_id')
 
         try:
            start_date = datetime.strptime(str_start_date, "%B %d, %Y").date()
@@ -67,7 +68,13 @@ class MileageReportREST(APIView):
         if not manager:
             return HttpResponseNotAllowed("Требуется аутентификация.")
         
-        if not all((str_start_date, str_end_date, period)):
+        if not all((str_start_date, str_end_date, period, vehicle_id)):
             return HttpResponseBadRequest("Не хватает одного или нескольких query- параметров")
+
+        reports_query = VehicleMileageReport.objects.filter(vehicle__id=vehicle_id)\
+                                                    .filter(start_datetime__gte=start_date)\
+                                                    .filter(end_datetime__lte=end_date)
         
-        return JsonResponse(data={"1":"2"})
+        values = MileageValue.objects.filter(report__in=reports_query)
+
+        
