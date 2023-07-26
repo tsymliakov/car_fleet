@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -13,26 +13,81 @@
 <body>
     <form action={% url "reports" %} method="post"> {% csrf_token %}
         <div>
-            Расскладка отчета:
-            <select name="type" id="type">
-                <option value="day">По дням</option>
-                <option value="month">По мсяцам</option>
-                <option value="year">По годам</option>
+            Раскладка отчета:
+            <select name="layout" id="layout">
+                <option selected value="Любая">Любая</option>
+                <option value="Дневная">По дням</option>
+                <option value="Месячная">По месяцам</option>
+                <option value="Годовая">По годам</option>
             </select>
         </div>
-        <input type="text" name="daterange" value="01/01/2018 - 01/15/2018" />
         <p></p>
-        <button type="submit">Получить отчеты</button>
+        <input type="text" name="daterange" value="01/01/2018 - 01/03/2018" />
+        <p></p>
+        <button type="submit">Отфильтровать</button>
     </form>
 
+    {% if reports %}
+    <table>
+        <tr>
+            <td>Тип</td>
+            <td>Название</td>
+            <td>Выкладка</td>
+        </tr>
+        {% for r in reports %}
+        <tr>
+            <td>{{ r.type }}</td>
+            <td>{{ r.name }}</td>
+            <td>{{ r.period }}</td>
+            {% if r.type == mileage_report_type %}
+            <td>
+                <a href="{% url 'get_mileage_report_rest' %}?vehicle_id={{r.vehicle.id}}&type={{r.type}}&period={{r.period}}&&start_date={{r.start_datetime}}&end_date={{r.end_datetime}}&period={{r.period}}">Отчет по автомобилю с ID {{ r.vehicle.id }}</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
 </body>
+
 <script>
-    $(function() {
-      $('input[name="daterange"]').daterangepicker({
-        opens: 'left'
-      }, function(start, end, label) {
-        console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-      });
-    });
+    $('input[name=daterange]').daterangepicker({
+    "locale": {
+        "format": "DD/MM/YYYY",
+        "separator": " ",
+        "applyLabel": "Применить",
+        "cancelLabel": "Отмена",
+        "fromLabel": "От",
+        "toLabel": "До",
+        "customRangeLabel": "Custom",
+        "weekLabel": "Н",
+        "daysOfWeek": [
+            "Вс",
+            "Пн",
+            "Вт",
+            "Ср",
+            "Чт",
+            "Пт",
+            "Сб"
+        ],
+        "monthNames": [
+            "Январь",
+            "Февраль",
+            "Март",
+            "Апрель",
+            "Май",
+            "Июнь",
+            "Июль",
+            "Август",
+            "Сентябрь",
+            "Октябрь",
+            "Ноябрь",
+            "Декабрь"
+        ],
+        "firstDay": 1
+    },
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+});
 </script>
 </html>

@@ -1,6 +1,5 @@
 from django.http import HttpResponse
 from django.utils import timezone
-from django.utils.timezone import activate
 from django.views import View
 import datetime
 

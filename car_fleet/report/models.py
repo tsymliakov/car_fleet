@@ -1,30 +1,37 @@
 from django.db import models
 
 # Create your models here.
-class AbstractReport(models.Model):
+class Report(models.Model):
     name = models.TextField()
     start_datetime = models.DateField()
     end_datetime = models.DateField()
+    type = models.TextField(editable=False)
 
-    DAY = 'DAY'
-    MONTH = 'MONTH'
-    YEAR = 'YEAR'
+    DAY = 'Дневная'
+    MONTH = 'Месячная'
+    YEAR = 'Годовая'
 
     period_choices = (
-        (DAY, 'day'),
-        (MONTH, 'month'),
-        (YEAR, 'year')
+        (DAY, 'Дневная'),
+        (MONTH, 'Месячная'),
+        (YEAR, 'Годовая')
     )
 
     period = models.TextField(choices=period_choices)
 
 
-class DateValue(models.Model):
+class MileAgeValue(models.Model):
     date_time = models.DateTimeField()
-    value = models.IntegerField()
+    mileage = models.IntegerField()
 
     report = models.ForeignKey(to='report.VehicleMileageReport', on_delete=models.CASCADE)
 
 
-class VehicleMileageReport(AbstractReport):
-    type = models.TextField(default="Пробег автомобиля за период", editable=False)
+class VehicleMileageReport(Report):
+    vehicle = models.ForeignKey(to='vehicle.Vehicle', on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        if not self.type:
+            self.type = "Пробег автомобиля за период"
+
+        super().save(*args, **kwargs)

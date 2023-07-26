@@ -7,5 +7,5 @@ class Route(models.Model):
                                    on_delete=models.CASCADE,
                                    related_name='route')
 
-    start = models.DateTimeField(default=datetime.now() - timedelta(hours=5))
-    end = models.DateTimeField(default=datetime.now())
+    start = models.DateTimeField(default=datetime(2023, 7, 26, 8, 36, 48, 734998))
+    end = models.DateTimeField(default=datetime(2023, 7, 26, 3, 36, 48, 734998))
