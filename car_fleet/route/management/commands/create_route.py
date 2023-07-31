@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from requests import request
 
 from point.models import Point
+from route.models import Route
 from vehicle.models import Vehicle
 from random import randint
 
@@ -15,6 +16,19 @@ EARTH_СIRCUMFERENCE = 40000 * 1000
 
 with open("settings.json", "r") as settings_file:
     api_key_openroute = load(settings_file)['api_key_openroute']
+
+
+def get_random_datetime():
+    year = randint(2021, 2023)
+    month = randint(1, 12)
+    day = randint(1, 28)
+    hour = randint(0, 23)
+    minute = randint(0, 59)
+    second = randint(0, 59)
+
+    random_date = datetime(year, month, day, hour, minute, second)
+
+    return random_date
 
 
 class Command(BaseCommand):
@@ -28,6 +42,7 @@ class Command(BaseCommand):
         parser.add_argument('--between-points', type=int)
         parser.add_argument('--points-deviation', type=int)
         parser.add_argument('--timestamp', type=int)
+        parser.add_argument('--count', type=int)
 
     def get_length_between_points(self, x1, y1, x2, y2):
         delta_x = abs(x2 - x1)
@@ -54,29 +69,39 @@ class Command(BaseCommand):
         return timedelta(seconds=seconds)
 
     def dot_points(self, points):
+        vehicles = Vehicle.objects.all()
+        vehicle = vehicles[randint(0, len(vehicles))]
+
+
         for p in points:
             Point.objects.create(time=datetime.now(),
-                                vehicle=self.vehicle,
+                                vehicle=vehicle,
                                 point=f'POINT({p[0] % 180} {p[1] % 90})').save()
 
-            sleep(1)
+            sleep(self.timestamp)
+
+
+        start = get_random_datetime()
+        end = start + timedelta(self.timestamp * len(points))
+        route = Route.objects.create(vehicle = vehicle, start=start, end=end)
+        route.save()
 
     def handle(self, *args, **options):
-        self.vehicle = Vehicle.objects.get(id=469)  # Vehicle.objects.get(id=options['id'])
         self.length = options['length'] or 10000
         self.max_speed = options['max_speed'] or 20
         self.max_acceleration = options['max_acceleration'] or 5
         self.between_points = options['between_points'] or 25
         self.points_deviation = options['points_deviation']
-        self.timestamp = options['timestamp'] or 1
+        self.timestamp = options['timestamp'] or 0.00001
+        self.count = options['count'] or 1
 
-        Point.objects.all().delete()
+        i = 0
 
-        route = self.create_route()
-
-        less_route = route[::len(route) // 20]
-
-        self.dot_points(less_route)
+        while i < self.count:
+            route = self.create_route()
+            less_route = route[::len(route) // 50]
+            self.dot_points(less_route)
+            i += 1
 
     def create_route(self):
         while True:

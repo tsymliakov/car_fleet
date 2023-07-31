@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 from json import load
 
@@ -30,7 +30,7 @@ SECRET_KEY = LOCAL_SETTINGS.get("secret_key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = LOCAL_SETTINGS.get("debug")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -96,10 +96,11 @@ WSGI_APPLICATION = 'car_fleet.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': LOCAL_SETTINGS.get('db_name'),
-        'USER': LOCAL_SETTINGS.get('db_username'),
-        'PASSWORD': LOCAL_SETTINGS.get('db_user_password'),
-        'HOST': LOCAL_SETTINGS.get('host')
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', 5432),
+        'USER': os.getenv('POSTGRES_USER', LOCAL_SETTINGS.get('db_username')),
+        'NAME': os.getenv('POSTGRES_DB', LOCAL_SETTINGS.get('db_name')),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', LOCAL_SETTINGS.get('db_user_password')),
     }
 }
 

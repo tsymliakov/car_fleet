@@ -1,0 +1,30 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgis/postgis
+    container_name: postgis_base
+    restart: always
+    volumes:
+      - /home/yonder/car_fleet_base/data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: car_fleet_db
+    ports:
+      - "54321:5432"
+
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: car_fleet
+    container_name: car_fleet_app
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
