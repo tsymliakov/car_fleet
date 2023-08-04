@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'point',
     'route',
     'report',
+    'telegram_bot',
 ]
 
 REST_FRAMEWORK = {
