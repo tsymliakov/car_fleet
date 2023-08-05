@@ -44,15 +44,6 @@ class Command(BaseCommand):
         parser.add_argument('--timestamp', type=int)
         parser.add_argument('--count', type=int)
 
-    def get_length_between_points(self, x1, y1, x2, y2):
-        delta_x = abs(x2 - x1)
-        delta_y = abs(y2 - y1)
-
-        length_degrees = sqrt(delta_x ** 2 + delta_y ** 2)
-        length_meters = length_degrees / 360 * EARTH_СIRCUMFERENCE
-
-        return length_meters
-
     def get_timedelta(self, distance):
         acceleration = randint(0, self.max_acceleration)
         end_speed = sqrt(self.start_speed ** 2 + 2 * acceleration * distance)
@@ -76,29 +67,17 @@ class Command(BaseCommand):
         else:
             vehicle = Vehicle.objects.get(id=self.vehicle_id)
 
-        curr_point = points[0]
-        distance = 0
-
         for p in points:
             Point.objects.create(time=datetime.now(),
                                  vehicle=vehicle,
                                  point=f'POINT({p[0] % 180} {p[1] % 90})').save()
 
-            distance += self.get_length_between_points(curr_point[0],
-                                                       curr_point[1],
-                                                       p[0],
-                                                       p[1])
-
-            curr_point = p
-
             sleep(self.timestamp)
 
         start = get_random_datetime()
         end = start + timedelta(self.timestamp * len(points))
-        route = Route.objects.create(vehicle=vehicle, start=start, end=end, distance=distance)
-        vehicle.mileage += distance
+        route = Route.objects.create(vehicle=vehicle, start=start, end=end)
 
-        vehicle.save()
         route.save()
 
     def handle(self, *args, **options):

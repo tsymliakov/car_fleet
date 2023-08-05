@@ -8,8 +8,11 @@ from telebot import types
 import telebot
 
 from enterprise.models import Enterprise
+from point.models import Point
 from route.models import Route
 from vehicle.models import Vehicle
+
+from helpers.helpers import get_distance
 
 with open("settings.json", "r") as settings_file:
     LOCAL_SETTINGS = load(settings_file)
@@ -126,13 +129,18 @@ def get_company_mileage(message):
         start_date = datetime.strptime(info[1], format)
         end_date = datetime.strptime(info[2], format)
 
-        routes = Route.objects.filter(vehicle__enterprise=company) \
-            .filter(start__gte=start_date) \
-            .filter(end__lte=end_date)
+        all_distance = 0
 
-        distance = routes.aggregate(Sum('distance'))['distance__sum'] or 0
+        vehicles = Vehicle.objects.filter(enterprise=company)
 
-        bot.send_message(message.chat.id, str(distance))
+        for v in vehicles:
+            points = Point.objects.filter(vehicle=v).filter(time__gte=start_date).filter(time__lte=end_date).order_by('time')
+
+            simple_points = [(p.point[0], p.point[1]) for p in points[1:]]
+
+            all_distance += get_distance(simple_points)
+
+        bot.send_message(message.chat.id, f"Суммарный пробег за выбранный период составил {int(all_distance // 1000)} км.")
         manager_menu(message)
         return
     except:
