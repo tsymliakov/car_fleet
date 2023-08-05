@@ -3,10 +3,12 @@ from json import load
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth import authenticate, login
+from django.db.models import Sum
 from telebot import types
 import telebot
 
 from enterprise.models import Enterprise
+from route.models import Route
 from vehicle.models import Vehicle
 
 with open("settings.json", "r") as settings_file:
@@ -71,7 +73,7 @@ def get_car_mileage(message):
             manager_menu(message)
             return
 
-        if not vehicle.company.manager.filter(id=user_credentials[message.chat.id].id).exists():
+        if not vehicle.enterprise.manager.filter(id=user_credentials[message.chat.id].id).exists():
             bot.send_message(message.chat.id, 'У Вас нет доступа этой компании, владеющей этим автомобилем.')
             manager_menu(message)
             return
@@ -79,7 +81,15 @@ def get_car_mileage(message):
         start_date = datetime.strptime(info[1], format)
         end_date = datetime.strptime(info[2], format)
 
-        # подсчет пробега у целого предприятия не реализован
+        routes = Route.objects.filter(vehicle__id=vehicle_id)\
+                              .filter(start__gte=start_date)\
+                              .filter(end__lte=end_date)
+
+        distance = routes.aggregate(Sum('distance'))['distance__sum'] or 0
+
+        bot.send_message(message.chat.id, str(distance))
+        manager_menu(message)
+        return
     except:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = types.KeyboardButton("Вернуться в меню менеджера")
@@ -116,7 +126,15 @@ def get_company_mileage(message):
         start_date = datetime.strptime(info[1], format)
         end_date = datetime.strptime(info[2], format)
 
-        # подсчет пробега у целого предприятия не реализован
+        routes = Route.objects.filter(vehicle__enterprise=company) \
+            .filter(start__gte=start_date) \
+            .filter(end__lte=end_date)
+
+        distance = routes.aggregate(Sum('distance'))['distance__sum'] or 0
+
+        bot.send_message(message.chat.id, str(distance))
+        manager_menu(message)
+        return
     except:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = types.KeyboardButton("Вернуться в меню менеджера")
@@ -170,13 +188,13 @@ def handle_credentials(message):
         nickname = nick_pass[0]
         password = nick_pass[1]
     except:
-        bot.send_message(message.chat.id, 'Вероятно, вы передали данные в не верном формате.' +
+        bot.send_message(message.chat.id, 'Вероятно, вы передали данные в неверном формате.' +
                          ' Попробуйте еще раз.')
         bot.register_next_step_handler(message, handle_credentials)
         return
 
     if nickname == 'Котичка' and password == "123":
-        bot.send_message(message.chat.id, "Котик тебя поцеловал, котичка милая :-*")
+        bot.send_message(message.chat.id, "Котичка милая, тебе поцелуй  😘")
         bot.send_message(message.chat.id, "Но все же логин или пароль не верны." +
                          " Попробуйте еще.")
         bot.register_next_step_handler(message, handle_credentials)
@@ -185,7 +203,7 @@ def handle_credentials(message):
     user = authenticate(username=nickname, password=password)
 
     if not user:
-        bot.send_message(message.chat.id, "Не верный логин или пароль. Попробуйте еще раз.")
+        bot.send_message(message.chat.id, "Неверный логин или пароль. Попробуйте еще раз.")
         bot.register_next_step_handler(message, handle_credentials)
         return
 

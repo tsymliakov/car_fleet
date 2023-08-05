@@ -4,4 +4,4 @@ from .models import Route
 
 @admin.register(Route)
 class AdminBrand(admin.ModelAdmin):
-    list_display = ['id', 'vehicle', 'start', 'end']
+    list_display = ['id', 'vehicle', 'start', 'end', 'distance']
