@@ -69,24 +69,40 @@ class Command(BaseCommand):
         return timedelta(seconds=seconds)
 
     def dot_points(self, points):
-        vehicles = Vehicle.objects.all()
-        vehicle = vehicles[randint(0, len(vehicles))]
 
+        if self.vehicle_id is None:
+            vehicles = Vehicle.objects.all()
+            vehicle = vehicles[randint(0, len(vehicles))]
+        else:
+            vehicle = Vehicle.objects.get(id=self.vehicle_id)
+
+        curr_point = points[0]
+        distance = 0
 
         for p in points:
             Point.objects.create(time=datetime.now(),
-                                vehicle=vehicle,
-                                point=f'POINT({p[0] % 180} {p[1] % 90})').save()
+                                 vehicle=vehicle,
+                                 point=f'POINT({p[0] % 180} {p[1] % 90})').save()
+
+            distance += self.get_length_between_points(curr_point[0],
+                                                       curr_point[1],
+                                                       p[0],
+                                                       p[1])
+
+            curr_point = p
 
             sleep(self.timestamp)
 
-
         start = get_random_datetime()
         end = start + timedelta(self.timestamp * len(points))
-        route = Route.objects.create(vehicle = vehicle, start=start, end=end)
+        route = Route.objects.create(vehicle=vehicle, start=start, end=end, distance=distance)
+        vehicle.mileage += distance
+
+        vehicle.save()
         route.save()
 
     def handle(self, *args, **options):
+        self.vehicle_id = options['id'] or None
         self.length = options['length'] or 10000
         self.max_speed = options['max_speed'] or 20
         self.max_acceleration = options['max_acceleration'] or 5
