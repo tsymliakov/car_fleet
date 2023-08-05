@@ -10,7 +10,6 @@ from faker import Faker
 class Vehicle(models.Model):
     rental_per_hour = models.FloatField()
     total_cost = models.IntegerField()
-    mileage = models.IntegerField()
     production_year = models.IntegerField(
         validators=(
             MinValueValidator(1960),
