@@ -201,13 +201,6 @@ def handle_credentials(message):
         bot.register_next_step_handler(message, handle_credentials)
         return
 
-    if nickname == 'Котичка' and password == "123":
-        bot.send_message(message.chat.id, "Котичка милая, тебе поцелуй  😘")
-        bot.send_message(message.chat.id, "Но все же логин или пароль не верны." +
-                         " Попробуйте еще.")
-        bot.register_next_step_handler(message, handle_credentials)
-        return
-
     user = authenticate(username=nickname, password=password)
 
     if not user:
